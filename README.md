@@ -1,182 +1,88 @@
 # Football Event & Live Scoring Platform
 
-Full-stack football tournament and live-scoring platform built with
-**Django, Django REST Framework, Django Channels, PostgreSQL, Redis,
-Next.js, and TypeScript**.
-
-> Current status: Phases 1--3 completed/in progress through the domain
-> models and tests.
+Tournament management and live scoring built with Django, DRF, Channels,
+PostgreSQL, Redis, Next.js, TypeScript, and JWT authentication.
 
 ## Setup
 
-### Requirements
+Requirements: Python 3.11+, Node.js 20+, and Docker Compose.
 
--   Python 3.11+
--   Node.js 20+
--   Docker / Docker Compose
-
-### Start PostgreSQL and Redis
-
-``` bash
+```bash
+# PostgreSQL and Redis
 docker compose up -d
-```
 
-### Backend
-
-``` bash
+# Backend
 cd backend
 python -m venv .venv
-```
-
-Windows:
-
-``` powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-Install dependencies and configure environment:
-
-``` bash
+# Windows: .\.venv\Scripts\Activate.ps1
+# Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-Copy `.env.example` to `.env`, then run:
-
-``` bash
+cp .env.example .env
 python manage.py migrate
 python manage.py runserver
-```
 
-Backend: `http://localhost:8000`
-
-### Frontend
-
-``` bash
+# Frontend (separate terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend: `http://localhost:3000`
+When Django runs locally against the Compose database, set
+`POSTGRES_PORT=5433` in `backend/.env`. Also replace `SECRET_KEY` with a strong
+random value. The API and frontend run at `http://localhost:8000/api/` and
+`http://localhost:3000`.
 
-> Currently Docker Compose starts PostgreSQL and Redis. The final
-> version will aim to run the complete stack with `docker compose up`.
+Compose currently starts infrastructure only; Django and Next.js run locally.
 
 ## Architecture
 
-``` text
-Next.js
-   |
-   +---- REST ----> Django REST Framework
-   |                     |
-   |                Service Layer
-   |                     |
-   |                 PostgreSQL
-   |
-   +-- WebSocket --> Django Channels
-                         |
-                       Redis
+```text
+Next.js -> REST -> DRF -> service layer -> PostgreSQL
+       -> WebSocket -> Channels -> Redis
 ```
 
-Core models:
+- REST supplies initial and authoritative state.
+- Public reads require no token; staff writes use SimpleJWT.
+- Match actions and future simulation commands share the same atomic services.
+- Match flow is strictly `scheduled -> live -> finished`.
+- Only goals change scores; cards and penalty kicks are timeline events.
+- Standings are calculated from finished matches plus reward points.
 
-``` text
-Event
- ├── EventTeam ── Team
- └── Round
-      └── Match
-           └── MatchEvent
+JWT tokens are available at `/api/auth/token/` and
+`/api/auth/token/refresh/`. CRUD endpoints cover events, teams, assignments,
+rounds, and matches; match-control endpoints expose start, goal, penalty,
+reward, and finish operations.
+
+## Real-time flow
+
+Phase 6 will add the following flow without polling:
+
+```text
+Admin/simulator -> service -> database -> post-save signal
+               -> Channels group -> Redis -> WebSocket -> Next.js
 ```
 
-Current domain rules include:
+The client will fetch REST state first, then apply WebSocket updates. Planned
+groups include `match_<id>` and `live_matches`; broadcasts will occur only after
+successful transaction commits.
 
--   Event end date cannot precede start date.
--   A team cannot be added twice to the same event.
--   Round order is unique per event.
--   A team cannot play itself.
--   Both match teams must belong to the event.
--   A team cannot play twice in the same round.
--   Match events must belong to a participating team.
--   Reward points are only allowed on reward events.
+## Assumptions and trade-offs
 
-## Real-Time Flow
-
-Planned real-time flow:
-
-``` text
-Admin / Simulator
-       |
-       v
-Service Layer
-       |
-       v
-PostgreSQL
-       |
-       v
-Django Signal
-       |
-       v
-Redis / Channels
-       |
-       v
-WebSocket
-       |
-       v
-Next.js UI
-```
-
-REST will provide initial/current state. WebSockets will push live
-score, status, and timeline changes without polling.
-
-Simulation commands and admin actions will use the **same service-layer
-functions** so behavior remains consistent.
-
-## Authentication
-
-Public read operations will remain accessible without authentication.
-
-Administrative write operations will use **JWT authentication with
-SimpleJWT** and admin/staff permissions.
-
-## Assumptions & Trade-offs
-
--   Match flow is strictly `scheduled -> live -> finished`.
--   `penalty_kick` does not automatically mean a goal.
--   Standings will initially be calculated from finished matches and
-    reward points instead of stored in a separate table.
--   Business logic will live in a reusable service layer rather than
-    views, serializers, or model `save()` methods.
--   Models are split into separate files for maintainability.
--   PostgreSQL and Redis currently run in Docker while Django and
-    Next.js run locally for easier development/debugging.
--   Match minutes allow values above 90 so future extra-time support
-    remains possible.
+- PostgreSQL is authoritative; Redis is used only for the channel layer.
+- Standings are calculated rather than persisted to avoid stale derived data.
+- A penalty kick does not imply a goal; a scored penalty also needs a goal event.
+- Match minutes may exceed 90 to allow extra time.
+- Docker currently covers PostgreSQL and Redis, not the complete application.
 
 ## Tests
 
-Run:
-
-``` bash
+```bash
 cd backend
+python manage.py check
 python manage.py test football.tests
+python manage.py makemigrations --check --dry-run
 ```
 
-Phase 3 tests cover model creation, database constraints, match
-scheduling rules, event-team validation, and MatchEvent validation.
-
-## Progress
-
-``` text
-Phase 1  Architecture                         ✓
-Phase 2  Infrastructure Setup                 ✓
-Phase 3  Models, Constraints & Tests          ✓
-Phase 4  Service Layer                        Next
-Phase 5  REST API + JWT
-Phase 6  WebSockets
-Phase 7  Simulation
-Phase 8  Next.js UI
-Phase 9  Real-Time Frontend
-Phase 10 Admin Controls
-Phase 11 Integration Tests
-Phase 12 Docker, README & Final Polish
-```
+The suite covers models, services, PostgreSQL concurrency, JWT permissions,
+REST CRUD/actions, standings, and query efficiency. Phases 1-5 are complete;
+Channels/WebSockets, simulation, and the public frontend follow in later phases.

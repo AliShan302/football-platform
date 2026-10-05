@@ -105,6 +105,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS":
         "rest_framework.pagination.PageNumberPagination",
 
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
+
+    "EXCEPTION_HANDLER":
+        "football.api.exception_handler.api_exception_handler",
+
     "PAGE_SIZE": 20,
 }
 
