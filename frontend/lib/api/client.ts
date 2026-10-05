@@ -15,11 +15,13 @@ function getApiBaseUrl(): string {
   throw new Error("NEXT_PUBLIC_API_URL must be configured in production.");
 }
 
-export async function apiFetch<T>(path: string): Promise<T> {
+export async function apiFetch<T>(path: string, signal?: AbortSignal): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${getApiBaseUrl()}${path}`, { cache: "no-store" });
+    const url = /^https?:\/\//.test(path) ? path : `${getApiBaseUrl()}${path}`;
+    response = await fetch(url, { cache: "no-store", signal });
   } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
     throw new ApiError(
       error instanceof Error ? error.message : "The API is unavailable.",
       0,

@@ -30,7 +30,8 @@ npm run dev
 
 When Django runs locally against the Compose database, set
 `POSTGRES_PORT=5433` in `backend/.env`. Also replace `SECRET_KEY` with a strong
-random value. Set `NEXT_PUBLIC_API_URL` in `frontend/.env.local`. The API and frontend run at `http://localhost:8000/api/` and
+random value. Set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in
+`frontend/.env.local`. The API and frontend run at `http://localhost:8000/api/` and
 `http://localhost:3000`.
 
 Compose currently starts infrastructure only; Django and Next.js run locally.
@@ -63,9 +64,12 @@ Admin/simulator -> service -> database -> post-save signal
                -> Channels group -> Redis -> WebSocket -> Next.js
 ```
 
-The client fetches REST state first, then subscribes to
+The match and live-score pages fetch REST state first, then subscribe to
 `ws/matches/<id>/` or `ws/live-matches/`. Groups are named `match_<id>` and
 `live_matches`; broadcasts occur only after successful transaction commits.
+After reconnecting, the frontend refreshes authoritative REST state and replays
+messages received during that refresh. HTTPS deployments must configure a
+`wss://` value for `NEXT_PUBLIC_WS_URL`.
 
 ## Assumptions and trade-offs
 
@@ -85,8 +89,8 @@ python manage.py makemigrations --check --dry-run
 ```
 
 The suite covers models, services, PostgreSQL concurrency, JWT permissions,
-REST CRUD/actions, standings, query efficiency, and WebSockets. Phases 1-6 are
-complete; simulation and the public frontend follow in later phases.
+REST CRUD/actions, standings, query efficiency, WebSockets, simulation, and
+frontend realtime state.
 
 For a manual Redis check, start Compose and connect WebSocket clients to both
 routes, then trigger match actions through REST. Updates should arrive only
