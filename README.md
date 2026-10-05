@@ -55,16 +55,16 @@ reward, and finish operations.
 
 ## Real-time flow
 
-Phase 6 will add the following flow without polling:
+Live updates use the following flow without polling:
 
 ```text
 Admin/simulator -> service -> database -> post-save signal
                -> Channels group -> Redis -> WebSocket -> Next.js
 ```
 
-The client will fetch REST state first, then apply WebSocket updates. Planned
-groups include `match_<id>` and `live_matches`; broadcasts will occur only after
-successful transaction commits.
+The client fetches REST state first, then subscribes to
+`ws/matches/<id>/` or `ws/live-matches/`. Groups are named `match_<id>` and
+`live_matches`; broadcasts occur only after successful transaction commits.
 
 ## Assumptions and trade-offs
 
@@ -84,5 +84,9 @@ python manage.py makemigrations --check --dry-run
 ```
 
 The suite covers models, services, PostgreSQL concurrency, JWT permissions,
-REST CRUD/actions, standings, and query efficiency. Phases 1-5 are complete;
-Channels/WebSockets, simulation, and the public frontend follow in later phases.
+REST CRUD/actions, standings, query efficiency, and WebSockets. Phases 1-6 are
+complete; simulation and the public frontend follow in later phases.
+
+For a manual Redis check, start Compose and connect WebSocket clients to both
+routes, then trigger match actions through REST. Updates should arrive only
+after the REST mutation commits; reconnecting clients should re-fetch REST state.
