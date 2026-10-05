@@ -24,12 +24,13 @@ python manage.py runserver
 # Frontend (separate terminal)
 cd frontend
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
 When Django runs locally against the Compose database, set
 `POSTGRES_PORT=5433` in `backend/.env`. Also replace `SECRET_KEY` with a strong
-random value. The API and frontend run at `http://localhost:8000/api/` and
+random value. Set `NEXT_PUBLIC_API_URL` in `frontend/.env.local`. The API and frontend run at `http://localhost:8000/api/` and
 `http://localhost:3000`.
 
 Compose currently starts infrastructure only; Django and Next.js run locally.

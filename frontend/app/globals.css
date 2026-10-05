@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f3f6f4;
+  --foreground: #10201d;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+* { box-sizing: border-box; }
+html { background: var(--background); }
 body {
-  background: var(--background);
+  margin: 0;
+  background: radial-gradient(circle at 90% 5%, rgba(52, 211, 153, 0.09), transparent 25rem), var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+a { transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease; }
+
+@layer components {
+  .page-shell { @apply mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-14; }
+  .page-heading { @apply mb-9 max-w-3xl; }
+  .page-heading h1 { @apply mt-2 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl; }
+  .page-heading p:last-child { @apply mt-4 text-lg leading-8 text-slate-600; }
+  .section-heading { @apply mb-6 flex flex-wrap items-end justify-between gap-4; }
+  .section-heading h2 { @apply mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl; }
+  .section-heading > a { @apply text-sm font-bold text-emerald-700 hover:text-emerald-900; }
+  .eyebrow { @apply text-xs font-black uppercase tracking-[0.2em] text-emerald-700; }
+  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.05)]; }
+  .button-primary { @apply inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-3 text-sm font-black text-emerald-950 hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300; }
+  .button-dark { @apply inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white; }
+  .button-secondary { @apply inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-800; }
 }
