@@ -90,3 +90,15 @@ complete; simulation and the public frontend follow in later phases.
 For a manual Redis check, start Compose and connect WebSocket clients to both
 routes, then trigger match actions through REST. Updates should arrive only
 after the REST mutation commits; reconnecting clients should re-fetch REST state.
+
+## Simulation
+
+```bash
+cd backend
+python manage.py simulate_match <match_id> --speed 5 --seed 42
+python manage.py simulate_event <event_id> --speed 5 --seed 42
+```
+
+Simulation uses the same services and WebSocket flow as REST match controls.
+Pressing Ctrl+C stops immediately and may leave the current match live with its
+already-committed events and score intact.
