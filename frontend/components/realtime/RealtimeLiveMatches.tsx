@@ -28,7 +28,7 @@ function reportProtocolError(message: LiveMatchesRealtimeMessage) {
   }
 }
 
-export function RealtimeLiveMatches({ initialMatches }: { initialMatches: MatchSummary[] }) {
+export function RealtimeLiveMatches({ initialMatches, adminControls = false }: { initialMatches: MatchSummary[]; adminControls?: boolean }) {
   const [matches, setMatches] = useState(initialMatches);
   const url = useMemo(() => buildWebSocketUrl("/live-matches/"), []);
   const resynchronize = useCallback(
@@ -65,12 +65,12 @@ export function RealtimeLiveMatches({ initialMatches }: { initialMatches: MatchS
       <div className="mb-5 flex justify-end"><ConnectionStatus status={status} /></div>
       {matches.length ? (
         <div className="grid gap-5 lg:grid-cols-2">
-          {matches.map((match) => <MatchCard key={match.id} match={match} />)}
+          {matches.map((match) => <MatchCard key={match.id} match={match} detailsHref={adminControls ? `/admin/matches/${match.id}` : undefined} detailsLabel={adminControls ? "Control match" : undefined} />)}
         </div>
       ) : (
         <EmptyState
-          title="No matches are currently live"
-          description="Upcoming and completed fixtures remain available through their events."
+          title={adminControls ? "No live matches" : "No matches are currently live"}
+          description={adminControls ? "Scheduled fixtures are available below and will move here when started." : "Upcoming and completed fixtures remain available through their events."}
         />
       )}
     </>

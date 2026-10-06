@@ -4,24 +4,32 @@ import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { TeamIdentity } from "./TeamIdentity";
 
-export function MatchCard({ match }: { match: MatchSummary }) {
+export function MatchCard({
+  match,
+  detailsHref,
+  detailsLabel = "Match details",
+}: {
+  match: MatchSummary;
+  detailsHref?: string;
+  detailsLabel?: string;
+}) {
   const showScore = match.status !== "scheduled";
   return (
-    <article className="card p-5">
-      <div className="mb-5 flex items-center justify-between gap-3">
+    <article className="card p-4 sm:p-5">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
         <StatusBadge status={match.status} />
         <span className="text-xs text-slate-500">{formatDateTime(match.scheduled_at)}</span>
       </div>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        <TeamIdentity team={match.home_team} />
-        <div className="rounded-xl bg-slate-950 px-3 py-2 text-center text-xl font-black tabular-nums text-white">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+        <TeamIdentity team={match.home_team} side="home" />
+        <div className="order-first rounded-xl bg-slate-950 px-3 py-2 text-center text-xl font-black tabular-nums text-white sm:order-none">
           {showScore ? `${match.home_score} – ${match.away_score}` : "vs"}
         </div>
-        <TeamIdentity team={match.away_team} align="right" />
+        <div className="sm:[&>div]:flex-row-reverse sm:[&>div]:text-right"><TeamIdentity team={match.away_team} side="away" /></div>
       </div>
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-sm">
-        <span className="truncate text-slate-500">{match.venue || "Venue TBC"}</span>
-        <Link className="font-bold text-emerald-700 hover:text-emerald-900" href={`/matches/${match.id}`}>Match details →</Link>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-sm">
+        <span className="min-w-0 break-words text-slate-500">{match.venue || "Venue TBC"}</span>
+        <Link className="button-secondary" href={detailsHref ?? `/matches/${match.id}`}>{detailsLabel} →</Link>
       </div>
     </article>
   );

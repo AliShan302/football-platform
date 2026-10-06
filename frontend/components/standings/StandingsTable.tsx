@@ -4,7 +4,9 @@ import { EmptyState } from "@/components/ui/EmptyState";
 export function StandingsTable({ rows }: { rows: StandingRow[] }) {
   if (!rows.length) return <EmptyState title="No standings available yet" />;
   return (
-    <div className="card overflow-x-auto">
+    <div>
+      <p className="mb-2 text-xs font-medium text-slate-500 sm:hidden">Scroll horizontally to view all statistics →</p>
+      <div className="card overflow-x-auto overscroll-x-contain">
       <table className="w-full min-w-[760px] border-collapse text-sm">
         <thead className="bg-slate-950 text-left text-xs uppercase tracking-wider text-slate-300">
           <tr>{["Pos", "Team", "P", "W", "D", "L", "GF", "GA", "GD", "Reward", "Pts"].map((heading) => <th key={heading} scope="col" className="px-4 py-3">{heading}</th>)}</tr>
@@ -20,6 +22,7 @@ export function StandingsTable({ rows }: { rows: StandingRow[] }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

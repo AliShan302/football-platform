@@ -25,11 +25,11 @@ export default function AdminLoginPage() {
   }
   return (
     <div className="page-shell grid min-h-[65vh] place-items-center">
-      <form className="card w-full max-w-md space-y-5 p-7" onSubmit={submit}>
+      <form className="section-card w-full max-w-md space-y-5" onSubmit={submit}>
         <div><p className="eyebrow">Administration</p><h1 className="text-3xl font-black">Sign in</h1></div>
-        {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
-        <label className="block text-sm font-bold">Username<input className="mt-2 w-full rounded-xl border border-slate-300 p-3 font-normal" name="username" required autoComplete="username" /></label>
-        <label className="block text-sm font-bold">Password<input className="mt-2 w-full rounded-xl border border-slate-300 p-3 font-normal" name="password" type="password" required autoComplete="current-password" /></label>
+        {error && <p role="alert" className="alert-error">{error}</p>}
+        <label className="field-label">Username<input className="form-control mt-1.5 font-normal" name="username" required autoComplete="username" /></label>
+        <label className="field-label">Password<input className="form-control mt-1.5 font-normal" name="password" type="password" required autoComplete="current-password" /></label>
         <button className="button-primary w-full" disabled={pending} type="submit">{pending ? "Signing in…" : "Sign in"}</button>
       </form>
     </div>

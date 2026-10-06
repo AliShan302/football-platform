@@ -33,12 +33,12 @@ export function EventForm({ eventId }: { eventId?: number }) {
   if (loading) return <p role="status">Loading event…</p>;
   const field = (name: keyof EventInput, value: string) => setValues((current) => ({ ...current, [name]: value }));
   return (
-    <form className="card max-w-2xl space-y-5 p-6" onSubmit={submit}>
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-800">{error}</p>}
-      <label className="block font-bold">Name<input className="mt-2 w-full rounded-xl border p-3 font-normal" value={values.name} onChange={(e) => field("name", e.target.value)} required /></label>
-      <label className="block font-bold">Description<textarea className="mt-2 min-h-28 w-full rounded-xl border p-3 font-normal" value={values.description} onChange={(e) => field("description", e.target.value)} /></label>
-      <div className="grid gap-4 sm:grid-cols-2"><label className="font-bold">Start date<input className="mt-2 w-full rounded-xl border p-3 font-normal" type="date" value={values.start_date} onChange={(e) => field("start_date", e.target.value)} required /></label><label className="font-bold">End date<input className="mt-2 w-full rounded-xl border p-3 font-normal" type="date" value={values.end_date} onChange={(e) => field("end_date", e.target.value)} required /></label></div>
-      <label className="block font-bold">Status<select className="mt-2 w-full rounded-xl border p-3 font-normal" value={values.status} onChange={(e) => field("status", e.target.value)}><option value="draft">Draft</option><option value="active">Active</option><option value="completed">Completed</option></select></label>
+    <form className="section-card max-w-2xl space-y-5" onSubmit={submit}>
+      {error && <p role="alert" className="alert-error">{error}</p>}
+      <label className="field-label">Name<input className="form-control mt-1.5 font-normal" value={values.name} onChange={(e) => field("name", e.target.value)} required /></label>
+      <label className="field-label">Description<textarea className="form-control mt-1.5 min-h-28 font-normal" value={values.description} onChange={(e) => field("description", e.target.value)} /></label>
+      <div className="grid gap-4 sm:grid-cols-2"><label className="field-label">Start date<input className="form-control mt-1.5 font-normal" type="date" value={values.start_date} onChange={(e) => field("start_date", e.target.value)} required /></label><label className="field-label">End date<input className="form-control mt-1.5 font-normal" type="date" value={values.end_date} onChange={(e) => field("end_date", e.target.value)} required /></label></div>
+      <label className="field-label">Status<select className="form-control mt-1.5 font-normal" value={values.status} onChange={(e) => field("status", e.target.value)}><option value="draft">Draft</option><option value="active">Active</option><option value="completed">Completed</option></select></label>
       <button className="button-primary" disabled={pending}>{pending ? "Saving…" : "Save event"}</button>
     </form>
   );

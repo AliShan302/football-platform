@@ -50,7 +50,7 @@ export function MatchControl({ initialMatch }: { initialMatch: MatchDetail }) {
     finally { setPending(false); }
   }
   return (
-    <div className="space-y-10">
+    <div className="admin-match-control space-y-8">
       <div className="flex justify-end">{match.status !== "finished" && <ConnectionStatus status={connectionStatus} />}</div>
       <Scoreboard match={match} />
       <dl className="grid gap-3 sm:grid-cols-2"><div className="card p-4"><dt className="text-xs font-bold uppercase text-slate-400">Scheduled</dt><dd className="mt-2 font-semibold">{formatDateTime(match.scheduled_at)}</dd></div><div className="card p-4"><dt className="text-xs font-bold uppercase text-slate-400">Venue</dt><dd className="mt-2 font-semibold">{match.venue || "To be confirmed"}</dd></div></dl>

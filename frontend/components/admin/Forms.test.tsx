@@ -47,4 +47,20 @@ describe("admin forms", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save team" }));
     await waitFor(() => expect(adminResources.updateTeam).toHaveBeenCalledWith(2, { name: "Alpha FC", code: "ALP" }));
   });
+
+  it("uploads an optional team logo as multipart form data", async () => {
+    vi.mocked(adminResources.createTeam).mockResolvedValue({ id: 3, name: "Arsenal", code: "ARS", logo: "/media/arsenal.webp" });
+    render(<TeamForm />);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Arsenal" } });
+    fireEvent.change(screen.getByLabelText("Code"), { target: { value: "ARS" } });
+    const logo = new File(["logo"], "arsenal.webp", { type: "image/webp" });
+    fireEvent.change(screen.getByLabelText(/Team logo/), { target: { files: [logo] } });
+    fireEvent.click(screen.getByRole("button", { name: "Save team" }));
+    await waitFor(() => expect(adminResources.createTeam).toHaveBeenCalled());
+    const payload = vi.mocked(adminResources.createTeam).mock.calls[0][0];
+    expect(payload).toBeInstanceOf(FormData);
+    expect((payload as FormData).get("name")).toBe("Arsenal");
+    expect((payload as FormData).get("code")).toBe("ARS");
+    expect((payload as FormData).get("logo")).toBe(logo);
+  });
 });

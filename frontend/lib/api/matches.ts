@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { MatchDetail, MatchSummary, PaginatedResponse } from "./types";
+import type { MatchDetail, MatchStatus, MatchSummary, PaginatedResponse } from "./types";
 import { sortLiveMatches } from "../realtime/reducers";
 
 export function getMatch(id: string, signal?: AbortSignal) {
@@ -23,4 +23,21 @@ export async function getAllLiveMatches(signal?: AbortSignal) {
   }
   if (next) throw new Error("Live-match pagination exceeded the 100-page safety limit.");
   return sortLiveMatches([...matches.values()]);
+}
+
+export async function getAllMatchesByStatus(status: MatchStatus, signal?: AbortSignal) {
+  const matches = new Map<number, MatchSummary>();
+  let next: string | null = `/matches/?status=${encodeURIComponent(status)}`;
+  let pages = 0;
+
+  while (next && pages < 100) {
+    const page: PaginatedResponse<MatchSummary> = await apiFetch(next, signal);
+    for (const match of page.results) matches.set(match.id, match);
+    next = page.next;
+    pages += 1;
+  }
+  if (next) throw new Error("Match pagination exceeded the 100-page safety limit.");
+  return [...matches.values()].sort((left, right) =>
+    left.scheduled_at.localeCompare(right.scheduled_at) || left.id - right.id
+  );
 }

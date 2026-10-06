@@ -15,8 +15,8 @@ export function MatchTimeline({ events }: { events: MatchEvent[] }) {
   return (
     <ol className="space-y-3">
       {events.map((event) => (
-        <li key={event.id} className="card flex gap-4 p-4">
-          <div className="w-12 shrink-0 text-center text-lg font-black tabular-nums text-slate-900">{event.minute}&apos;</div>
+        <li key={event.id} className="card flex gap-3 p-4 sm:gap-4">
+          <div className="w-9 shrink-0 text-center text-base font-black tabular-nums text-slate-900 sm:w-12 sm:text-lg">{event.minute}&apos;</div>
           <span className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg text-xs font-black ${eventStyles[event.type]}`} aria-hidden="true">
             {event.type === "goal" ? "G" : event.type === "reward" ? "R" : "!"}
           </span>

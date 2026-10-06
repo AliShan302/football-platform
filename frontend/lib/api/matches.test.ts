@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getAllLiveMatches } from "./matches";
+import { getAllLiveMatches, getAllMatchesByStatus } from "./matches";
 
 const team = { id: 1, name: "Alpha", code: "ALP", logo: null };
 const match = (id: number, scheduledAt: string) => ({
@@ -33,5 +33,19 @@ describe("getAllLiveMatches", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(result.map(({ id }) => id)).toEqual([8, 9]);
     expect(result[1].home_score).toBe(1);
+  });
+});
+
+describe("getAllMatchesByStatus", () => {
+  it("requests the selected status and orders fixtures by schedule", async () => {
+    const later = { ...match(9, "2026-01-02T12:00:00Z"), status: "scheduled" as const };
+    const earlier = { ...match(8, "2026-01-01T12:00:00Z"), status: "scheduled" as const };
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ count: 2, next: null, previous: null, results: [later, earlier] }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await getAllMatchesByStatus("scheduled");
+
+    expect(fetchMock.mock.calls[0][0]).toContain("/matches/?status=scheduled");
+    expect(result.map(({ id }) => id)).toEqual([8, 9]);
   });
 });

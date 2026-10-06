@@ -58,6 +58,11 @@ describe("realtime view behavior", () => {
     expect(screen.getByText("No matches are currently live")).toBeTruthy();
   });
 
+  it("links admin live matches directly to their controls", () => {
+    render(<RealtimeLiveMatches initialMatches={[matchSummary()]} adminControls />);
+    expect(screen.getByRole("link", { name: /Control match/ }).getAttribute("href")).toBe("/admin/matches/8");
+  });
+
   it("applies a finished status before intentionally closing the match socket", () => {
     const initialMatch: MatchDetail = { ...matchSummary(), match_events: [] };
     render(<RealtimeMatchView initialMatch={initialMatch} />);

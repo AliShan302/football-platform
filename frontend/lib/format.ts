@@ -2,7 +2,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
   year: "numeric",
-  timeZone: "UTC",
+  timeZone: "Asia/Karachi",
 });
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -11,8 +11,8 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
   hour: "2-digit",
   minute: "2-digit",
-  timeZone: "UTC",
-  timeZoneName: "short",
+  hourCycle: "h23",
+  timeZone: "Asia/Karachi",
 });
 
 export function formatDate(value: string): string {
@@ -20,7 +20,7 @@ export function formatDate(value: string): string {
 }
 
 export function formatDateTime(value: string): string {
-  return dateTimeFormatter.format(new Date(value));
+  return `${dateTimeFormatter.format(new Date(value))} PKT`;
 }
 
 export function formatLabel(value: string): string {

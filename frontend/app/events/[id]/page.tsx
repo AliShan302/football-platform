@@ -18,8 +18,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   catch (error) { if (error instanceof ApiError && error.status === 404) notFound(); throw error; }
   const [event, standings] = data;
   return (
-    <div className="page-shell space-y-14">
-      <header className="rounded-3xl bg-[#071b18] p-7 text-white sm:p-10">
+    <div className="page-shell space-y-10 sm:space-y-14">
+      <header className="event-hero rounded-3xl p-5 text-white sm:p-10">
         <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-sm font-bold uppercase tracking-wider text-emerald-300">Tournament</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">{event.name}</h1></div><StatusBadge status={event.status} /></div>
         <p className="mt-5 max-w-3xl leading-7 text-emerald-50/75">{event.description || "Tournament details will be announced soon."}</p>
         <p className="mt-6 text-sm font-semibold text-emerald-100">{formatDate(event.start_date)} — {formatDate(event.end_date)}</p>
