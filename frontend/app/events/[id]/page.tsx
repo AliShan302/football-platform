@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RoundSection } from "@/components/events/RoundSection";
 import { TeamList } from "@/components/events/TeamList";
-import { StandingsTable } from "@/components/standings/StandingsTable";
+import { RealtimeStandings } from "@/components/standings/RealtimeStandings";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ApiError } from "@/lib/api/client";
 import { getEvent, getStandings } from "@/lib/api/events";
@@ -25,7 +25,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <p className="mt-6 text-sm font-semibold text-emerald-100">{formatDate(event.start_date)} — {formatDate(event.end_date)}</p>
       </header>
       <Section title="Registered teams"><TeamList teams={event.teams} /></Section>
-      <Section title="Standings"><StandingsTable rows={standings} /></Section>
+      <Section title="Standings"><RealtimeStandings eventId={event.id} initialRows={standings} /></Section>
       <Section title="Rounds and fixtures">{event.rounds.length ? <div className="space-y-10">{event.rounds.map((round) => <RoundSection key={round.id} round={round} />)}</div> : <div className="card p-8 text-center text-slate-500">No rounds have been scheduled.</div>}</Section>
     </div>
   );

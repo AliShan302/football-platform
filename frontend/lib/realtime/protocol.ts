@@ -4,6 +4,7 @@ import type {
   MatchStatus,
   MatchSummary,
   TeamSummary,
+  StandingRow,
 } from "@/lib/api/types";
 import type { RealtimeMessage, RealtimeScore } from "./types";
 
@@ -94,6 +95,15 @@ function isMatchSummary(value: unknown): value is MatchSummary {
   );
 }
 
+function isStandingRow(value: unknown): value is StandingRow {
+  return isRecord(value) &&
+    isId(value.team_id) &&
+    typeof value.team_name === "string" &&
+    typeof value.team_code === "string" &&
+    ["played", "won", "drawn", "lost", "goals_for", "goals_against", "goal_difference", "match_points", "reward_points", "total_points"]
+      .every((field) => isNumber(value[field]));
+}
+
 export function parseRealtimeMessage(raw: unknown): RealtimeMessage | null {
   let value: unknown = raw;
   if (typeof raw === "string") {
@@ -130,6 +140,13 @@ export function parseRealtimeMessage(raw: unknown): RealtimeMessage | null {
         isStatus(value.status) &&
         isScore(value.final_score) &&
         isStringOrNull(value.ended_at)
+        ? (value as unknown as RealtimeMessage)
+        : null;
+    case "standings.updated":
+      return isId(value.event_id) &&
+        isId(value.trigger_match_id) &&
+        Array.isArray(value.standings) &&
+        value.standings.every(isStandingRow)
         ? (value as unknown as RealtimeMessage)
         : null;
     case "error":

@@ -66,6 +66,20 @@ class RealtimeConnectionTests(TransactionTestCase):
 
         async_to_sync(scenario)()
 
+    def test_existing_event_standings_connects_anonymously_and_is_read_only(self):
+        async def scenario():
+            communicator = WebsocketCommunicator(
+                self.application, f"/ws/events/{self.match.round.event_id}/standings/"
+            )
+            connected, _ = await communicator.connect()
+            self.assertTrue(connected)
+            await communicator.send_json_to({"action": "refresh"})
+            response = await communicator.receive_json_from()
+            self.assertEqual(response["code"], "read_only_connection")
+            await communicator.disconnect()
+
+        async_to_sync(scenario)()
+
     def test_disconnect_removes_group_membership(self):
         async def scenario():
             communicator = WebsocketCommunicator(

@@ -142,3 +142,23 @@ class RealtimeBroadcastTests(TransactionTestCase):
             await live_socket.disconnect()
 
         async_to_sync(scenario)()
+
+    def test_finish_broadcasts_authoritative_event_standings(self):
+        start_match(match_id=self.match.pk)
+        add_goal(match_id=self.match.pk, team_id=self.home.pk, minute=10)
+
+        async def scenario():
+            event_socket = await self._connect(
+                f"/ws/events/{self.match.round.event_id}/standings/"
+            )
+            await database_sync_to_async(finish_match)(match_id=self.match.pk)
+            payload = await event_socket.receive_json_from()
+            self.assertEqual(payload["type"], "standings.updated")
+            self.assertEqual(payload["event_id"], self.match.round.event_id)
+            self.assertEqual(payload["trigger_match_id"], self.match.pk)
+            self.assertEqual(payload["standings"][0]["team_id"], self.home.pk)
+            self.assertEqual(payload["standings"][0]["played"], 1)
+            self.assertEqual(payload["standings"][0]["total_points"], 3)
+            await event_socket.disconnect()
+
+        async_to_sync(scenario)()

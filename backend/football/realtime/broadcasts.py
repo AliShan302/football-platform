@@ -10,7 +10,9 @@ from .payloads import (
     live_match_updated_message,
     match_event_message,
     match_status_message,
+    standings_updated_message,
 )
+from football.services import calculate_standings
 
 
 logger = logging.getLogger(__name__)
@@ -19,6 +21,10 @@ LIVE_MATCHES_GROUP = "live_matches"
 
 def match_group_name(match_id: int) -> str:
     return f"match_{match_id}"
+
+
+def event_standings_group_name(event_id: int) -> str:
+    return f"event_{event_id}_standings"
 
 
 def _send(group: str, payload: dict) -> None:
@@ -55,6 +61,15 @@ def broadcast_match_status(match_id: int) -> None:
         )
     elif match.status == MatchStatus.FINISHED:
         _send(LIVE_MATCHES_GROUP, live_match_removed_message(match))
+        event_id = match.round.event_id
+        _send(
+            event_standings_group_name(event_id),
+            standings_updated_message(
+                event_id=event_id,
+                match_id=match.pk,
+                standings=calculate_standings(event_id=event_id),
+            ),
+        )
 
 
 def broadcast_match_event(event_id: int) -> None:

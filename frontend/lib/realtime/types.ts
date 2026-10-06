@@ -2,6 +2,7 @@ import type {
   MatchEvent,
   MatchStatus,
   MatchSummary,
+  StandingRow,
 } from "@/lib/api/types";
 
 export type ConnectionStatus =
@@ -56,6 +57,14 @@ export interface RealtimeErrorMessage {
   detail: string;
 }
 
+export interface StandingsUpdatedMessage {
+  version: 1;
+  type: "standings.updated";
+  event_id: number;
+  trigger_match_id: number;
+  standings: StandingRow[];
+}
+
 export type MatchRealtimeMessage =
   | MatchStatusMessage
   | MatchEventMessage
@@ -66,9 +75,12 @@ export type LiveMatchesRealtimeMessage =
   | LiveMatchRemovedMessage
   | RealtimeErrorMessage;
 
+export type StandingsRealtimeMessage = StandingsUpdatedMessage | RealtimeErrorMessage;
+
 export type RealtimeMessage =
   | MatchStatusMessage
   | MatchEventMessage
   | LiveMatchUpdatedMessage
   | LiveMatchRemovedMessage
+  | StandingsUpdatedMessage
   | RealtimeErrorMessage;

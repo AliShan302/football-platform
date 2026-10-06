@@ -93,3 +93,30 @@ def live_match_removed_message(match) -> dict:
         "final_score": score_payload(match),
         "ended_at": _datetime(match.ended_at),
     }
+
+
+def standings_updated_message(*, event_id: int, match_id: int, standings) -> dict:
+    return {
+        "version": PROTOCOL_VERSION,
+        "type": "standings.updated",
+        "event_id": event_id,
+        "trigger_match_id": match_id,
+        "standings": [
+            {
+                "team_id": row.team_id,
+                "team_name": row.team_name,
+                "team_code": row.team_code,
+                "played": row.played,
+                "won": row.won,
+                "drawn": row.drawn,
+                "lost": row.lost,
+                "goals_for": row.goals_for,
+                "goals_against": row.goals_against,
+                "goal_difference": row.goal_difference,
+                "match_points": row.match_points,
+                "reward_points": row.reward_points,
+                "total_points": row.total_points,
+            }
+            for row in standings
+        ],
+    }

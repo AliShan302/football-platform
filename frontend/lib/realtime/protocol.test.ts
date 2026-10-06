@@ -27,6 +27,7 @@ const match = {
   ended_at: null,
   venue: "Ground",
 };
+const standing = { team_id: 1, team_name: "Alpha", team_code: "ALP", played: 1, won: 1, drawn: 0, lost: 0, goals_for: 1, goals_against: 0, goal_difference: 1, match_points: 3, reward_points: 0, total_points: 3 };
 
 describe("parseRealtimeMessage", () => {
   it.each([
@@ -34,6 +35,7 @@ describe("parseRealtimeMessage", () => {
     { version: 1, type: "match.event", match_id: 4, event, score },
     { version: 1, type: "live_match.updated", reason: "started", match },
     { version: 1, type: "live_match.removed", match_id: 4, status: "finished", final_score: score, ended_at: "2026-01-01T13:00:00Z" },
+    { version: 1, type: "standings.updated", event_id: 2, trigger_match_id: 4, standings: [standing] },
     { version: 1, type: "error", code: "read_only_connection", detail: "Read only" },
   ])("accepts valid $type messages", (message) => {
     expect(parseRealtimeMessage(JSON.stringify(message))).toEqual(message);
@@ -45,6 +47,7 @@ describe("parseRealtimeMessage", () => {
     JSON.stringify({ version: 1, type: "future.message" }),
     JSON.stringify({ version: 1, type: "match.status", match_id: 0, status: "live", started_at: null, ended_at: null, score }),
     JSON.stringify({ version: 1, type: "match.event", match_id: 4, event, score: { home: "1", away: 0 } }),
+    JSON.stringify({ version: 1, type: "standings.updated", event_id: 2, trigger_match_id: 4, standings: [{ ...standing, total_points: "3" }] }),
   ])("ignores malformed or unsupported input", (raw) => {
     expect(parseRealtimeMessage(raw)).toBeNull();
   });
