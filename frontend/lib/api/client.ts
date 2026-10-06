@@ -9,6 +9,10 @@ export class ApiError extends Error {
 }
 
 export function getApiBaseUrl(): string {
+  if (typeof window === "undefined") {
+    const internal = process.env.API_INTERNAL_URL?.replace(/\/$/, "");
+    if (internal) return internal;
+  }
   const configured = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   if (configured) return configured;
   if (process.env.NODE_ENV !== "production") return "http://localhost:8000/api";
