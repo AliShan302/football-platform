@@ -1,4 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from rest_framework.response import Response
 
 from football.api.permissions import IsAdminOrReadOnly
 from football.api.serializers import (
@@ -8,6 +10,7 @@ from football.api.serializers import (
 )
 from football.api.serializers.common import ProtectedDeleteMixin
 from football.models import EventTeam, Team
+from football.services import delete_event_team_assignment
 
 
 class TeamViewSet(ProtectedDeleteMixin, ModelViewSet):
@@ -30,3 +33,7 @@ class EventTeamViewSet(ProtectedDeleteMixin, ModelViewSet):
         if self.action in {"list", "retrieve"}:
             return EventTeamReadSerializer
         return EventTeamWriteSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        delete_event_team_assignment(assignment=self.get_object())
+        return Response(status=status.HTTP_204_NO_CONTENT)

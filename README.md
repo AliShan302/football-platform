@@ -30,7 +30,8 @@ npm run dev
 
 When Django runs locally against the Compose database, set
 `POSTGRES_PORT=5433` in `backend/.env`. Also replace `SECRET_KEY` with a strong
-random value. Set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in
+random value. Create an administrator with `python manage.py createsuperuser`.
+Set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` in
 `frontend/.env.local`. The API and frontend run at `http://localhost:8000/api/` and
 `http://localhost:3000`.
 
@@ -50,10 +51,18 @@ Next.js -> REST -> DRF -> service layer -> PostgreSQL
 - Only goals change scores; cards and penalty kicks are timeline events.
 - Standings are calculated from finished matches plus reward points.
 
-JWT tokens are available at `/api/auth/token/` and
-`/api/auth/token/refresh/`. CRUD endpoints cover events, teams, assignments,
+The browser admin is available at `/admin/login`. It uses access and refresh
+JWTs in HttpOnly cookies plus Django CSRF protection; frontend requests include
+credentials but JavaScript never receives the tokens. Raw JWT endpoints remain
+available at `/api/auth/token/` and `/api/auth/token/refresh/` for non-browser
+API clients. CRUD endpoints cover events, teams, assignments,
 rounds, and matches; match-control endpoints expose start, goal, penalty,
 reward, and finish operations.
+
+Credentialed CORS and CSRF trust use the explicit `CORS_ALLOWED_ORIGINS` and
+`CSRF_TRUSTED_ORIGINS` backend environment values. Local development uses
+`SameSite=Lax` and `JWT_COOKIE_SECURE=False`; production requires HTTPS and
+`JWT_COOKIE_SECURE=True`.
 
 ## Real-time flow
 

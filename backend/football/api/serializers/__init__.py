@@ -1,4 +1,5 @@
 from .actions import GoalRequestSerializer, PenaltyRequestSerializer, RewardRequestSerializer
+from .auth import AuthUserSerializer
 from .event import EventDetailSerializer, EventListSerializer, EventWriteSerializer
 from .match import MatchDetailSerializer, MatchListSerializer, MatchWriteSerializer
 from .match_event import MatchEventSerializer
@@ -12,7 +13,7 @@ from .team import (
 )
 
 __all__ = [
-    "EventDetailSerializer", "EventListSerializer", "EventTeamReadSerializer",
+    "AuthUserSerializer", "EventDetailSerializer", "EventListSerializer", "EventTeamReadSerializer",
     "EventTeamWriteSerializer", "EventWriteSerializer", "GoalRequestSerializer",
     "MatchDetailSerializer", "MatchEventSerializer", "MatchListSerializer",
     "MatchWriteSerializer", "PenaltyRequestSerializer", "RewardRequestSerializer",

@@ -8,7 +8,7 @@ export class ApiError extends Error {
   }
 }
 
-function getApiBaseUrl(): string {
+export function getApiBaseUrl(): string {
   const configured = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   if (configured) return configured;
   if (process.env.NODE_ENV !== "production") return "http://localhost:8000/api";

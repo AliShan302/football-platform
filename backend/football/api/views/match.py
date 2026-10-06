@@ -18,7 +18,14 @@ from football.api.serializers import (
 )
 from football.api.serializers.common import ProtectedDeleteMixin
 from football.models import Match, MatchEvent, MatchStatus
-from football.services import add_goal, add_penalty, add_reward, finish_match, start_match
+from football.services import (
+    add_goal,
+    add_penalty,
+    add_reward,
+    finish_match,
+    start_match,
+    validate_match_fixture_update,
+)
 
 
 def optimized_matches():
@@ -50,6 +57,13 @@ class MatchViewSet(ProtectedDeleteMixin, ModelViewSet):
         if self.action == "list":
             return MatchListSerializer
         return MatchWriteSerializer
+
+    def perform_update(self, serializer):
+        validate_match_fixture_update(
+            match=serializer.instance,
+            changes=serializer.validated_data,
+        )
+        serializer.save()
 
     def _serialized_match(self, match_id):
         match = optimized_matches().get(pk=match_id)

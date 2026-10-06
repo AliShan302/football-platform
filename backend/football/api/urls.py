@@ -4,6 +4,11 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from football.api.views import (
+    CookieLoginView,
+    CookieLogoutView,
+    CookieRefreshView,
+    CsrfTokenView,
+    CurrentUserView,
     EventTeamViewSet,
     EventViewSet,
     LiveMatchListView,
@@ -21,6 +26,11 @@ router.register("rounds", RoundViewSet, basename="round")
 router.register("matches", MatchViewSet, basename="match")
 
 urlpatterns = [
+    path("auth/csrf/", CsrfTokenView.as_view(), name="auth_csrf"),
+    path("auth/login/", CookieLoginView.as_view(), name="auth_login"),
+    path("auth/refresh/", CookieRefreshView.as_view(), name="auth_refresh"),
+    path("auth/logout/", CookieLogoutView.as_view(), name="auth_logout"),
+    path("auth/me/", CurrentUserView.as_view(), name="auth_me"),
     path(
         "auth/token/",
         TokenObtainPairView.as_view(permission_classes=[AllowAny]),

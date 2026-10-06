@@ -4,6 +4,7 @@ const links = [
   ["Dashboard", "/"],
   ["Events", "/events"],
   ["Live", "/live"],
+  ["Admin", "/admin"],
 ] as const;
 
 export function Header() {

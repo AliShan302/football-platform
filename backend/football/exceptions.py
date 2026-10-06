@@ -51,3 +51,21 @@ class InvalidRewardPoints(FootballServiceError):
     def __init__(self, points):
         self.points = points
         super().__init__("Reward points must be a non-zero integer.")
+
+
+class ProtectedEventTeamAssignment(FootballServiceError):
+    def __init__(self, *, event_id, team_id):
+        self.event_id = event_id
+        self.team_id = team_id
+        super().__init__(
+            "This team assignment is referenced by an event match and cannot be removed."
+        )
+
+
+class MatchFixtureLocked(FootballServiceError):
+    def __init__(self, *, match_id, status):
+        self.match_id = match_id
+        self.status = status
+        super().__init__(
+            f"Fixture metadata for match {match_id} cannot be edited while status is {status}."
+        )

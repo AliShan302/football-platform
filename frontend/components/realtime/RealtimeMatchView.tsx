@@ -1,74 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { MatchTimeline } from "@/components/matches/MatchTimeline";
 import { Scoreboard } from "@/components/matches/Scoreboard";
-import { getMatch } from "@/lib/api/matches";
 import type { MatchDetail } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
-import { parseRealtimeMessage } from "@/lib/realtime/protocol";
-import { reduceMatchRealtime } from "@/lib/realtime/reducers";
-import type { MatchRealtimeMessage } from "@/lib/realtime/types";
-import { buildWebSocketUrl } from "@/lib/realtime/websocket";
-import { useReconnectingWebSocket } from "@/hooks/useReconnectingWebSocket";
+import { useRealtimeMatch } from "@/hooks/useRealtimeMatch";
 import { ConnectionStatus } from "./ConnectionStatus";
 
-function parseMatchMessage(raw: unknown): MatchRealtimeMessage | null {
-  const message = parseRealtimeMessage(raw);
-  return message &&
-    (message.type === "match.status" ||
-      message.type === "match.event" ||
-      message.type === "error")
-    ? message
-    : null;
-}
-
-function reportProtocolError(message: MatchRealtimeMessage) {
-  if (message.type === "error" && process.env.NODE_ENV === "development") {
-    console.warn(`WebSocket protocol error: ${message.code}`);
-  }
-}
-
 export function RealtimeMatchView({ initialMatch }: { initialMatch: MatchDetail }) {
-  const [match, setMatch] = useState(initialMatch);
-  const enabled = match.status !== "finished";
-  const url = useMemo(
-    () => (enabled ? buildWebSocketUrl(`/matches/${initialMatch.id}/`) : null),
-    [enabled, initialMatch.id],
-  );
-  const resynchronize = useCallback(
-    (signal: AbortSignal) => getMatch(String(initialMatch.id), signal),
-    [initialMatch.id],
-  );
-  const onMessage = useCallback((message: MatchRealtimeMessage) => {
-    reportProtocolError(message);
-    if (message.type !== "error") {
-      setMatch((current) => reduceMatchRealtime(current, message));
-    }
-  }, []);
-  const onSynchronized = useCallback(
-    (snapshot: MatchDetail, buffered: MatchRealtimeMessage[]) => {
-      setMatch(
-        buffered.reduce((current, message) => {
-          reportProtocolError(message);
-          return reduceMatchRealtime(current, message);
-        }, snapshot),
-      );
-    },
-    [],
-  );
-  const { status, closePermanently } = useReconnectingWebSocket({
-    url,
-    enabled,
-    parseMessage: parseMatchMessage,
-    resynchronize,
-    onSynchronized,
-    onMessage,
-  });
-
-  useEffect(() => {
-    if (match.status === "finished") closePermanently();
-  }, [match.status, closePermanently]);
+  const { match, connectionStatus } = useRealtimeMatch(initialMatch);
 
   const details = [
     ["Scheduled", formatDateTime(match.scheduled_at)],
@@ -80,7 +20,7 @@ export function RealtimeMatchView({ initialMatch }: { initialMatch: MatchDetail 
   return (
     <div className="space-y-12">
       {match.status !== "finished" && (
-        <div className="flex justify-end"><ConnectionStatus status={status} /></div>
+        <div className="flex justify-end"><ConnectionStatus status={connectionStatus} /></div>
       )}
       <Scoreboard match={match} />
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

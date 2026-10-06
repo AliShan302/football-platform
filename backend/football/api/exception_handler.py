@@ -9,6 +9,8 @@ from football.exceptions import (
     InvalidRewardPoints,
     MatchNotFound,
     MatchNotLive,
+    MatchFixtureLocked,
+    ProtectedEventTeamAssignment,
     TeamNotInMatch,
 )
 
@@ -21,6 +23,11 @@ ERROR_MAPPINGS = {
     InvalidEventMinute: (status.HTTP_400_BAD_REQUEST, "invalid_event_minute"),
     InvalidRewardPoints: (status.HTTP_400_BAD_REQUEST, "invalid_reward_points"),
     InvalidPenaltyType: (status.HTTP_400_BAD_REQUEST, "invalid_penalty_type"),
+    ProtectedEventTeamAssignment: (
+        status.HTTP_409_CONFLICT,
+        "protected_resource",
+    ),
+    MatchFixtureLocked: (status.HTTP_409_CONFLICT, "match_fixture_locked"),
 }
 
 
